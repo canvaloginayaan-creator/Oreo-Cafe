@@ -75,20 +75,32 @@ The rules provide:
 - Customer access only to their own order history.
 - Validated pending-order and reservation creation.
 - Order/reservation administration only for admins.
+- Signed-in users can read only their own `admins/{uid}` role document.
+- Admin role documents cannot be created or changed from the public website.
 
 ## 3. Create and authorize the admin
 
-1. On the main website, open **Log in → Sign up**.
-2. Create the account using `canvalogin.ayaan@gmail.com`, or sign in with that Google account.
-3. For email/password signup, open the verification email and verify the address. In the account page, choose **I've verified** if needed.
-4. Open `admin.html` and sign in with the same credentials.
+1. Create the login account on the main website, or manually in **Authentication → Users → Add user**.
+2. Copy the account's **User UID** from **Authentication → Users**.
+3. In Firestore, start a collection named **`admins`**.
+4. Use that exact UID as the document ID:
 
-The default admin allow-list appears in both places:
+```text
+admins/{Authentication UID}
+```
 
-- `demo/demo/firebase-config.js` → `OREOS_ADMIN_EMAILS`
-- `firestore.rules` → `isAdmin()`
+5. Add these four fields:
 
-If you use a different admin email, change it in **both** files and publish the rules again. Signing up alone never grants admin access. A Firebase custom claim of `admin: true` is also supported.
+| Field | Type | Value |
+| --- | --- | --- |
+| `active` | boolean | `true` (required for access) |
+| `email` | string | The admin's email address |
+| `role` | string | `admin` |
+| `createdAt` | timestamp | Current date/time |
+
+6. Save the document, open `admin.html`, and sign in with that Authentication account. If the access-denied screen is already open, choose **Check access again**.
+
+Only `active` is used to authorize the account; the other fields are recommended metadata. Keep admin role management in Firebase Console or Admin SDK. A `users/{uid}` profile and an `admins/{uid}` role can share the same document ID because they are in different collections.
 
 After the first admin login, open **Products → Import starter menu** if you want to manage the original 24 products through Firestore. New and edited products appear on the public site in real time.
 
@@ -140,7 +152,8 @@ The root `firebase.json` is for Firebase Hosting/rules/functions deployment; it 
 - `products`: public menu products managed by the admin.
 - `orders`: customer details, item snapshots, totals and fulfilment status.
 - `reservations`: table requests, reservation status and email-delivery status.
-- `users`: basic account profile metadata; admin authorization is not taken from this collection.
+- `users`: basic account profile metadata.
+- `admins`: active administrator roles, keyed by Authentication UID and managed only through Console/Admin SDK.
 
 ## Product images and image-upload limits
 

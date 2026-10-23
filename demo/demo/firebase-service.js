@@ -8,7 +8,6 @@
     config.apiKey && config.projectId && config.appId &&
     !Object.values(config).some((value) => String(value).includes("YOUR_"))
   );
-  const adminEmails = (window.OREOS_ADMIN_EMAILS || []).map((email) => String(email).toLowerCase());
   const productListeners = new Set();
   const authListeners = new Set();
   let products = window.OreoData.DEFAULT_PRODUCTS.slice();
@@ -29,14 +28,17 @@
   }
 
   async function adminStatus(user) {
-    if (!user) return false;
-    const email = String(user.email || "").toLowerCase();
-    let hasClaim = false;
+    if (!user || !db) return false;
     try {
-      const token = await user.getIdTokenResult();
-      hasClaim = token && token.claims && token.claims.admin === true;
-    } catch (error) { /* email allow-list still works */ }
-    return hasClaim || Boolean(user.emailVerified && adminEmails.includes(email));
+      // The document ID is the Authentication UID. Only the account owner can
+      // read this document, and only a console/Admin SDK can change it.
+      const adminDocument = await db.collection("admins").doc(user.uid).get();
+      const data = adminDocument.exists ? adminDocument.data() : null;
+      return Boolean(data && data.active === true);
+    } catch (error) {
+      console.warn("Administrator role could not be loaded:", error.message);
+      return false;
+    }
   }
 
   async function notifyAuth(user) {

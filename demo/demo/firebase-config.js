@@ -18,12 +18,12 @@ window.firebaseConfig = {
 };
 
 /*
- * Administrator access is granted only to verified email addresses in this list.
- * Add the same address to isAdmin() in firestore.rules (already set for the
- * address below), or use an `admin: true` Firebase custom auth claim.
- * Signing up alone never grants administrator access.
+ * Administrator access is assigned in Firestore:
+ * 1. Copy the user's UID from Authentication > Users.
+ * 2. Create admins/{that UID} in Firestore with active: true (boolean).
+ * The website can read only the signed-in user's own admin document. The
+ * security rules prevent customers from creating or changing admin documents.
  */
-window.OREOS_ADMIN_EMAILS = ["canvalogin.ayaan@gmail.com"];
 
 /* Reservation notification recipient (the Cloud Function also uses this). */
 window.OREOS_CAFE_EMAIL = "canvalogin.ayaan@gmail.com";

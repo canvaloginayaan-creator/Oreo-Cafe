@@ -72,6 +72,7 @@ $("#adminGoogle").addEventListener("click", async () => {
 async function signOut() { await window.OreoFirebase.signOut(); }
 $("#adminSignOut").addEventListener("click", signOut);
 $("#deniedSignOut").addEventListener("click", signOut);
+$("#deniedRefresh").addEventListener("click", () => location.reload());
 window.OreoFirebase.onAuth((user, isAdmin) => {
   if (user && isAdmin) {
     $("#adminGate").hidden = true; $("#adminApp").hidden = false;
@@ -82,7 +83,7 @@ window.OreoFirebase.onAuth((user, isAdmin) => {
   } else {
     $("#adminGate").hidden = false; $("#adminApp").hidden = true;
     $("#gateLogin").hidden = Boolean(user); $("#gateDenied").hidden = !user;
-    if (user) $("#deniedEmail").textContent = "Signed in as " + (user.email || "this account") + (user.emailVerified ? "." : ". This email has not been verified yet.");
+    if (user) $("#deniedEmail").textContent = "Signed in as " + (user.email || "this account") + ". No active admin document was found for UID " + user.uid + ".";
     stopDashboard();
   }
 });

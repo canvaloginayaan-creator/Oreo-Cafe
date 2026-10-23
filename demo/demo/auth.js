@@ -41,10 +41,7 @@ $("#loginTab").addEventListener("click", () => showTab(false));
 $("#signupTab").addEventListener("click", () => showTab(true));
 function afterAuthentication(user) {
   if (!nextPage) return false;
-  if (nextPage === "admin.html" && user && !user.emailVerified && (window.OREOS_ADMIN_EMAILS || []).includes(String(user.email).toLowerCase())) {
-    setMessage("Your account is created. Verify your email, then use I've verified in your account to open the admin panel.");
-    return false;
-  }
+  // admin.html performs the admins/{uid} role check after authentication.
   location.href = nextPage;
   return true;
 }
@@ -104,7 +101,7 @@ window.OreoFirebase.onAuth((user, isAdmin) => {
   $("#accountEmail").textContent = user.email || "";
   $("#accountAvatar").textContent = (user.displayName || user.email || "O").charAt(0).toUpperCase();
   $("#adminAction").hidden = !isAdmin;
-  $("#verificationAction").hidden = user.emailVerified || !isAdmin && !(window.OREOS_ADMIN_EMAILS || []).includes(String(user.email).toLowerCase());
+  $("#verificationAction").hidden = user.emailVerified;
   if (isAdmin) {
     $("#accountNotice").hidden = false;
     $("#accountNotice").textContent = "Administrator access is active for this account.";

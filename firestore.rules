@@ -6,16 +6,20 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Keep the email allow-list in sync with OREOS_ADMIN_EMAILS in
-    // demo/demo/firebase-config.js. A custom admin:true auth claim also works.
+    // Admin access is granted by an active admins/{Authentication UID} document.
+    // Create and manage these documents only through Firebase Console/Admin SDK.
     function isAdmin() {
-      return signedIn() && (
-        request.auth.token.get('admin', false) == true ||
-        (
-          request.auth.token.get('email_verified', false) == true &&
-          request.auth.token.get('email', '') == 'canvalogin.ayaan@gmail.com'
-        )
-      );
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.get('active', false) == true;
+    }
+
+    match /admins/{adminId} {
+      // Needed so the app can check the signed-in user's own role.
+      allow get: if signedIn() && request.auth.uid == adminId;
+      allow list: if false;
+      // Admin roles cannot be granted or changed from the public website.
+      allow create, update, delete: if false;
     }
 
     match /products/{productId} {

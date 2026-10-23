@@ -29,12 +29,12 @@
       <div class="gate-divider">or</div>
       <button class="admin-btn" id="adminGoogle" type="button">Continue with Google</button>
       <div class="gate-message" id="adminLoginMessage" role="alert"></div>
-      <p class="gate-help">Need to create the admin user first? <a href="auth.html?next=admin.html">Sign up on the main website</a>. Only a verified allow-listed email can access this panel.</p>
+      <p class="gate-help">Need to create the admin user first? <a href="auth.html?next=admin.html">Sign up on the main website</a>. Then copy your Authentication UID into an active <strong>admins/{uid}</strong> document in Firestore.</p>
     </div>
     <div id="gateDenied" hidden>
       <span class="gate-eyebrow">Access restricted</span><h1>This account is not an admin</h1><p id="deniedEmail"></p>
-      <div class="gate-notice">Sign up is open to customers, but dashboard access requires a verified administrator email in <strong>firebase-config.js</strong> and <strong>firestore.rules</strong>, or an admin custom claim.</div>
-      <div class="gate-actions"><button class="admin-btn primary" id="deniedSignOut" type="button">Sign out</button><a class="admin-btn" href="index.html">Back to website</a></div>
+      <div class="gate-notice">Dashboard access requires a Firestore document at <strong>admins/{your Authentication UID}</strong> with <strong>active: true</strong> (boolean). Create it through Firebase Console, then check again.</div>
+      <div class="gate-actions"><button class="admin-btn primary" id="deniedRefresh" type="button">Check access again</button><button class="admin-btn" id="deniedSignOut" type="button">Sign out</button><a class="admin-btn" href="index.html">Back to website</a></div>
     </div>
   </div>
 </div>
